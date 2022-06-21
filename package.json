@@ -1,5 +1,5 @@
 {
-  "name": "@caribou/react-native-mapbox-navigation",
+  "name": "@sqware/react-native-mapbox-navigation",
   "title": "React Native Mapbox Navigation",
   "version": "2.0.0",
   "description": "Smart Mapbox turn-by-turn routing based on real-time traffic for React Native.",
@@ -30,10 +30,5 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
-  },
-  "devDependencies": {
-    "react": "17.0.2",
-    "react-native": "0.66.4",
-    "typescript": "4.3.5"
   }
 }
