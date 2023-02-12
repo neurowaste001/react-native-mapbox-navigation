@@ -555,12 +555,12 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         speechApi = MapboxSpeechApi(
             context,
             accessToken,
-            Locale.FRENCH.language
+            Locale.US.language
         )
         voiceInstructionsPlayer = MapboxVoiceInstructionsPlayer(
             context,
             accessToken,
-            Locale.FRENCH.language
+            Locale.US.language
         )
 
         // initialize route line, the withRouteLineBelowLayerId is specified to place
