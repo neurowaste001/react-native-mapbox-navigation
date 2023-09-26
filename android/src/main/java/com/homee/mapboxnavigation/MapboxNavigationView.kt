@@ -633,8 +633,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         if (this.path?.size == 0) {
             this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
         } else {
-            this.
-            (this.path)
+            this.setPath(this.path)
         }
     }
 
@@ -699,6 +698,9 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                 sendErrorToReact("Mapbox access token is not set")
                 return
             } else {
+                if (path == null) {
+                    sendErrorToReact("Error finding route")
+                }
 
                 val mapboxMapMatchingRequest = MapboxMapMatching.builder()
                     .accessToken(accessToken)
