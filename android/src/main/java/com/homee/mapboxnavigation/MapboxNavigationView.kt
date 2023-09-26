@@ -12,6 +12,9 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.uimanager.ThemedReactContext
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.api.matching.v5.MapboxMapMatching
@@ -82,7 +85,7 @@ import com.mapbox.navigation.ui.voice.model.SpeechVolume
 import java.util.Locale
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
-class MapboxNavigationView(private val context: ThemedReactContext, private val accessToken: String?) :
+class MapboxNavigationView(private val context: ThemedReactContext, private val accessToken: String) :
     FrameLayout(context.baseContext) {
 
     private companion object {
@@ -689,7 +692,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     }
 
-    private fun findPath(path: List) {
+    private fun findPath(path: List<Point>) {
         try {
             val mapboxMapMatchingRequest = MapboxMapMatching.builder()
                 .accessToken(accessToken)
@@ -697,12 +700,12 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                 .steps(true)
                 .profile(DirectionsCriteria.PROFILE_DRIVING)
                 .build()
+            mapboxNavigation.setRerouteController(null)
             mapboxMapMatchingRequest.enqueueCall(object : Callback<MapMatchingResponse> {
                 override fun onResponse(call: Call<MapMatchingResponse>, response: Response<MapMatchingResponse>) {
                     if (response.isSuccessful) {
                         response.body()?.matchings()?.let { matchingList ->
-                            matchingList[0].toDirectionRoute().apply {
-                                setRouteAndStartNavigation(listOf(this))
+                            setRouteAndStartNavigation(listOf(matchingList[0].toDirectionRoute())
                             }
                         }
                     } else {
@@ -784,7 +787,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         this.destination = destination
     }
 
-    fun setPath(path: List?) {
+    fun setPath(path: List<Point>?) {
         this.path = path
     }
 
