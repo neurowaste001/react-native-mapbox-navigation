@@ -79,7 +79,7 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) : Sim
             return
         }
         val newArray = mutableListOf<Point>()
-        var length = sources.size() - 1
+        var length = sources.size - 1
         for (i in 0..length) {
             newArray.add(Point.fromLngLat(sources.getArray(i).getDouble(0), sources.getArray(i).getDouble(1)))
         }
