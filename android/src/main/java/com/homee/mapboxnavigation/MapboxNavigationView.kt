@@ -717,25 +717,13 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                         response: Response<MapMatchingResponse>
                     ) {
                         if (response.isSuccessful) {
-                            response.body()?.matchings()?.let { matchingList ->
-                                matchingList[0].toDirectionRoute().toNavigationRoute(
-                                    RouterOrigin.Custom()
-                                ).apply {
-                                    mapboxNavigation?.setNavigationRoutes(listOf(this))
-
-                                    if (shouldSimulateRoute) {
-                                        startSimulation(listOf(this).first())
-                                    }
-
-                                    // show UI elements
-                                    binding.soundButton.visibility = View.VISIBLE
-                                    binding.routeOverview.visibility = View.VISIBLE
-                                    binding.tripProgressCard.visibility = View.VISIBLE
-
-                                    // move the camera to overview when new route is available
-                                    navigationCamera.requestNavigationCameraToFollowing()
-                                }
+                            val matchingList = response.body()?.matchings()
+                            val newArray = mutableListOf<DirectionsRoute>()
+                            var length = matchingList.size - 1
+                            for (i in 0..length) {
+                                newArray.add(matchingList[i].toDirectionRoute())
                             }
+                            setRouteAndStartNavigation(newArray)
                         } else {
                             sendErrorToReact("Error finding route")
                         }
