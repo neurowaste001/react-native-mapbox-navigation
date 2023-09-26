@@ -14,6 +14,9 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.uimanager.ThemedReactContext
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
+import com.mapbox.api.matching.v5.MapboxMapMatching
+import com.mapbox.api.matching.v5.models.MapMatchingMatching
+import com.mapbox.api.matching.v5.models.MapMatchingResponse
 import com.mapbox.bindgen.Expected
 import com.mapbox.geojson.Point
 import com.mapbox.maps.EdgeInsets
@@ -88,6 +91,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     private var origin: Point? = null
     private var destination: Point? = null
+    private var path: List<Point>? = listOf()
     private var shouldSimulateRoute = false
     private var showsEndOfRouteFeedback = false
     /**
@@ -623,7 +627,11 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         mapboxNavigation.registerVoiceInstructionsObserver(voiceInstructionsObserver)
         mapboxNavigation.registerRouteProgressObserver(replayProgressObserver)
 
-        this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
+        if (this.path?.size == 0) {
+            this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
+        } else {
+            this.path?.let { it -> this.findPath(it) }
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -675,6 +683,33 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                     }
                 }
             )
+        } catch (ex: Exception) {
+            sendErrorToReact(ex.toString())
+        }
+
+    }
+
+    private fun findPath(path: List) {
+        try {
+            val mapboxMapMatchingRequest = MapboxMapMatching.builder()
+                .accessToken(accessToken)
+                .coordinates(path)
+                .steps(true)
+                .profile(DirectionsCriteria.PROFILE_DRIVING)
+                .build()
+            mapboxMapMatchingRequest.enqueueCall(object : Callback<MapMatchingResponse> {
+                override fun onResponse(call: Call<MapMatchingResponse>, response: Response<MapMatchingResponse>) {
+                    if (response.isSuccessful) {
+                        response.body()?.matchings()?.let { matchingList ->
+                            matchingList[0].toDirectionRoute().apply {
+                                setRouteAndStartNavigation(listOf(this))
+                            }
+                        }
+                    } else {
+                        sendErrorToReact("Error finding route")
+                    }
+                }
+            })
         } catch (ex: Exception) {
             sendErrorToReact(ex.toString())
         }
@@ -747,6 +782,10 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     fun setDestination(destination: Point?) {
         this.destination = destination
+    }
+
+    fun setPath(path: List?) {
+        this.path = path
     }
 
     fun setShouldSimulateRoute(shouldSimulateRoute: Boolean) {
