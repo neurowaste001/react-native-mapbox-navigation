@@ -94,7 +94,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     private var origin: Point? = null
     private var destination: Point? = null
-    private var path = mutableListOf<Point>()
+    private var path : MutableList<Point>? = null
     private var shouldSimulateRoute = false
     private var showsEndOfRouteFeedback = false
     /**
@@ -633,7 +633,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         if (this.path?.size == 0) {
             this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
         } else {
-            this.setPath(this.path)
+            this.findPath(this.path)
         }
     }
 
@@ -700,11 +700,12 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
             } else {
                 if (path == null) {
                     sendErrorToReact("Error finding route")
+                    return
                 }
 
                 val mapboxMapMatchingRequest = MapboxMapMatching.builder()
                     .accessToken(accessToken)
-                    .coordinates(path)
+                    .coordinates(path.toList())
                     .steps(true)
                     .profile(DirectionsCriteria.PROFILE_DRIVING)
                     .build()
