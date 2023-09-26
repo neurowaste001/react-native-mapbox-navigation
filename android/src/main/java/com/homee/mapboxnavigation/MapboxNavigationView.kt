@@ -94,7 +94,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     private var origin: Point? = null
     private var destination: Point? = null
-    private var path: MutableList<Point>? = listOf()
+    private var path = mutableListOf<Point>()
     private var shouldSimulateRoute = false
     private var showsEndOfRouteFeedback = false
     /**
@@ -630,10 +630,11 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         mapboxNavigation.registerVoiceInstructionsObserver(voiceInstructionsObserver)
         mapboxNavigation.registerRouteProgressObserver(replayProgressObserver)
 
-        if (this.path?.size() == 0) {
+        if (this.path?.size == 0) {
             this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
         } else {
-            this.findPath(this.path)
+            this.
+            (this.path)
         }
     }
 
@@ -692,7 +693,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     }
 
-    private fun findPath(path: MutableList<Point>) {
+    private fun findPath(path: MutableList<Point>?) {
         try {
             if (accessToken == null) {
                 sendErrorToReact("Mapbox access token is not set")
@@ -802,7 +803,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         this.destination = destination
     }
 
-    fun setPath(path: List<Point>?) {
+    fun setPath(path: MutableList<Point>?) {
         this.path = path
     }
 
