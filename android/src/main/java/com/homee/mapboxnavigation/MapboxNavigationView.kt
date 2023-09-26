@@ -455,7 +455,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     @SuppressLint("MissingPermission")
     fun onCreate() {
-        if (accessToken == null) {
+        if (accessToken == "") {
             sendErrorToReact("Mapbox access token is not set")
             return
         }
@@ -705,8 +705,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                 override fun onResponse(call: Call<MapMatchingResponse>, response: Response<MapMatchingResponse>) {
                     if (response.isSuccessful) {
                         response.body()?.matchings()?.let { matchingList ->
-                            setRouteAndStartNavigation(listOf(matchingList[0].toDirectionRoute())
-                            }
+                            setRouteAndStartNavigation(listOf(matchingList[0].toDirectionRoute()))
                         }
                     } else {
                         sendErrorToReact("Error finding route")
