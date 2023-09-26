@@ -718,12 +718,17 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                     ) {
                         if (response.isSuccessful) {
                             val matchingList = response.body()?.matchings()
-                            val newArray = mutableListOf<DirectionsRoute>()
-                            var length = matchingList.size - 1
-                            for (i in 0..length) {
-                                newArray.add(matchingList[i].toDirectionRoute())
+                            if (matchingList == null) {
+                                sendErrorToReact("Error finding route")
+                                return
+                            } else {
+                                val newArray = mutableListOf<DirectionsRoute>()
+                                var length = matchingList.size - 1
+                                for (i in 0..length) {
+                                    newArray.add(matchingList.[i].toDirectionRoute())
+                                }
+                                setRouteAndStartNavigation(newArray.toList())
                             }
-                            setRouteAndStartNavigation(newArray.toList())
                         } else {
                             sendErrorToReact("Error finding route")
                         }
