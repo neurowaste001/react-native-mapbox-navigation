@@ -94,7 +94,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     private var origin: Point? = null
     private var destination: Point? = null
-    private var path: List<Point>? = listOf()
+    private var path: MutableList<Point>? = listOf()
     private var shouldSimulateRoute = false
     private var showsEndOfRouteFeedback = false
     /**
@@ -455,7 +455,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     @SuppressLint("MissingPermission")
     fun onCreate() {
-        if (accessToken == "") {
+        if (accessToken == null) {
             sendErrorToReact("Mapbox access token is not set")
             return
         }
@@ -694,24 +694,40 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     private fun findPath(path: List<Point>) {
         try {
-            val mapboxMapMatchingRequest = MapboxMapMatching.builder()
-                .accessToken(accessToken)
-                .coordinates(path)
-                .steps(true)
-                .profile(DirectionsCriteria.PROFILE_DRIVING)
-                .build()
-            mapboxNavigation.setRerouteController(null)
-            mapboxMapMatchingRequest.enqueueCall(object : Callback<MapMatchingResponse> {
-                override fun onResponse(call: Call<MapMatchingResponse>, response: Response<MapMatchingResponse>) {
-                    if (response.isSuccessful) {
-                        response.body()?.matchings()?.let { matchingList ->
-                            setRouteAndStartNavigation(listOf(matchingList[0].toDirectionRoute()))
+            if (accessToken == null) {
+                sendErrorToReact("Mapbox access token is not set")
+                return
+            } else {
+
+                val mapboxMapMatchingRequest = MapboxMapMatching.builder()
+                    .accessToken(accessToken)
+                    .coordinates(path)
+                    .steps(true)
+                    .profile(DirectionsCriteria.PROFILE_DRIVING)
+                    .build()
+                mapboxNavigation.setRerouteController(null)
+                mapboxMapMatchingRequest.enqueueCall(object : Callback<MapMatchingResponse> {
+                    override fun onResponse(
+                        call: Call<MapMatchingResponse>,
+                        response: Response<MapMatchingResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            response.body()?.matchings()?.let { matchingList ->
+                                setRouteAndStartNavigation(listOf(matchingList[0].toDirectionRoute()))
+                            }
+                        } else {
+                            sendErrorToReact("Error finding route")
                         }
-                    } else {
+                    }
+
+                    override fun onFailure(
+                        call: Call<MapMatchingResponse!>!,
+                        throwable: Throwable
+                    ) {
                         sendErrorToReact("Error finding route")
                     }
-                }
-            })
+                })
+            }
         } catch (ex: Exception) {
             sendErrorToReact(ex.toString())
         }

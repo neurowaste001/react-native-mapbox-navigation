@@ -13,7 +13,7 @@ import com.mapbox.maps.TileStoreUsageMode
 import javax.annotation.Nonnull
 
 class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) : SimpleViewManager<MapboxNavigationView>() {
-    private var accessToken: String = ""
+    private var accessToken: String? = null
 
     init {
         mCallerContext.runOnUiQueueThread {
@@ -78,8 +78,11 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) : Sim
             view.setPath(null)
             return
         }
-        val transform: (ReadableArray) -> ReadableArray = {Point.fromLngLat(it.getDouble(0), it.getDouble(1))}
-        view.setPath(sources.map(transform))
+        val arr: MutableList<Point> = listOf()
+        for (source: ReadableArray in sources) {
+            arr.add(Point.fromLngLat(source.getDouble(0), source.getDouble(1)))
+        }
+        view.setPath(arr)
     }
 
     @ReactProp(name = "shouldSimulateRoute")
