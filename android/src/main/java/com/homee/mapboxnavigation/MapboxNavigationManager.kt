@@ -78,11 +78,12 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) : Sim
             view.setPath(null)
             return
         }
-        val arr: MutableList<Point> = listOf()
-        for (source: ReadableArray in sources) {
-            arr.add(Point.fromLngLat(source.getDouble(0), source.getDouble(1)))
+        val newArray: MutableList<Point> = listOf()
+        var length = sources.size() - 1
+        for (i in 0..length) {
+            newArray.add(Point.fromLngLat(sources.getArray(i).getDouble(0), sources.getArray(i).getDouble(1)))
         }
-        view.setPath(arr)
+        view.setPath(newArray)
     }
 
     @ReactProp(name = "shouldSimulateRoute")

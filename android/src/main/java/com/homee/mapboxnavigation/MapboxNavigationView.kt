@@ -85,7 +85,7 @@ import com.mapbox.navigation.ui.voice.model.SpeechVolume
 import java.util.Locale
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
-class MapboxNavigationView(private val context: ThemedReactContext, private val accessToken: String) :
+class MapboxNavigationView(private val context: ThemedReactContext, private val accessToken: String?) :
     FrameLayout(context.baseContext) {
 
     private companion object {
@@ -630,10 +630,10 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         mapboxNavigation.registerVoiceInstructionsObserver(voiceInstructionsObserver)
         mapboxNavigation.registerRouteProgressObserver(replayProgressObserver)
 
-        if (this.path?.size == 0) {
+        if (this.path?.size() == 0) {
             this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
         } else {
-            this.path?.let { it -> this.findPath(it) }
+            this.findPath(this.path)
         }
     }
 
@@ -692,7 +692,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     }
 
-    private fun findPath(path: List<Point>) {
+    private fun findPath(path: MutableList<Point>) {
         try {
             if (accessToken == null) {
                 sendErrorToReact("Mapbox access token is not set")
@@ -721,7 +721,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                     }
 
                     override fun onFailure(
-                        call: Call<MapMatchingResponse!>!,
+                        call: Call<MapMatchingResponse>,
                         throwable: Throwable
                     ) {
                         sendErrorToReact("Error finding route")
