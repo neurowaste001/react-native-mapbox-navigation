@@ -707,9 +707,10 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                     .accessToken(accessToken)
                     .coordinates(path.toList())
                     .steps(true)
+                    .voiceInstructions(true)
+                    .bannerInstructions(true)
                     .profile(DirectionsCriteria.PROFILE_DRIVING)
                     .build()
-                mapboxNavigation.setRerouteController(null)
                 mapboxMapMatchingRequest.enqueueCall(object : Callback<MapMatchingResponse> {
                     override fun onResponse(
                         call: Call<MapMatchingResponse>,
@@ -717,7 +718,23 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                     ) {
                         if (response.isSuccessful) {
                             response.body()?.matchings()?.let { matchingList ->
-                                setRouteAndStartNavigation(listOf(matchingList[0].toDirectionRoute()))
+                                matchingList[0].toDirectionRoute().toNavigationRoute(
+                                    RouterOrigin.Custom()
+                                ).apply {
+                                    mapboxNavigation?.setNavigationRoutes(listOf(this))
+
+                                    if (shouldSimulateRoute) {
+                                        startSimulation(listOf(this).first())
+                                    }
+
+                                    // show UI elements
+                                    binding.soundButton.visibility = View.VISIBLE
+                                    binding.routeOverview.visibility = View.VISIBLE
+                                    binding.tripProgressCard.visibility = View.VISIBLE
+
+                                    // move the camera to overview when new route is available
+                                    navigationCamera.requestNavigationCameraToFollowing()
+                                }
                             }
                         } else {
                             sendErrorToReact("Error finding route")
