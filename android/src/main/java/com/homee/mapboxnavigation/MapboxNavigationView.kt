@@ -723,7 +723,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                             for (i in 0..length) {
                                 newArray.add(matchingList[i].toDirectionRoute())
                             }
-                            setRouteAndStartNavigation(newArray)
+                            setRouteAndStartNavigation(newArray.toList())
                         } else {
                             sendErrorToReact("Error finding route")
                         }
