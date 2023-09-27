@@ -725,7 +725,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                                 val newArray = mutableListOf<DirectionsRoute>()
                                 var length = matchingList.size - 1
                                 for (i in 0..length) {
-                                    newArray.add(matchingList[i].toDirectionRoute())
+                                    newArray.add(matchingList[i].toDirectionRoute().toBuilder().routeIndex(i.toString()).build())
                                 }
                                 setRouteAndStartNavigation(newArray.toList())
                             }
