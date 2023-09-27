@@ -623,6 +623,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     private fun startRoute() {
         // register event listeners
+        mapboxNavigation.setRerouteController(null)
         mapboxNavigation.registerRoutesObserver(routesObserver)
         mapboxNavigation.registerArrivalObserver(arrivalObserver)
         mapboxNavigation.registerRouteProgressObserver(routeProgressObserver)
