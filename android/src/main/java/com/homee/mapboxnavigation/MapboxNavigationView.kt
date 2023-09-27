@@ -707,7 +707,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                 val mapboxMapMatchingRequest = MapboxMapMatching.builder()
                     .accessToken(accessToken)
                     .coordinates(path.toList())
-                    .steps(true)
+                    .steps(false)
                     .voiceInstructions(true)
                     .bannerInstructions(true)
                     .profile(DirectionsCriteria.PROFILE_DRIVING)
