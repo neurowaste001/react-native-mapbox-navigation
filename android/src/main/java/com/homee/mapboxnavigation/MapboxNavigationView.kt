@@ -710,6 +710,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                     .voiceInstructions(true)
                     .bannerInstructions(true)
                     .profile(DirectionsCriteria.PROFILE_DRIVING)
+                    .language(Locale.FRENCH.language)
                     .build()
                 mapboxMapMatchingRequest.enqueueCall(object : Callback<MapMatchingResponse> {
                     override fun onResponse(
@@ -725,7 +726,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                                 val newArray = mutableListOf<DirectionsRoute>()
                                 var length = matchingList.size - 1
                                 for (i in 0..length) {
-                                    newArray.add(matchingList[i].toDirectionRoute().toBuilder().routeIndex(i.toString()).build())
+                                    newArray.add(matchingList[i].toDirectionRoute())
                                 }
                                 setRouteAndStartNavigation(newArray.toList())
                             }
