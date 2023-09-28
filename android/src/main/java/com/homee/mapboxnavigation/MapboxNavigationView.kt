@@ -710,7 +710,9 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                     .steps(true)
                     .voiceInstructions(true)
                     .bannerInstructions(true)
+                    .waypointIndices(0, path.toList().lastIndex)
                     .profile(DirectionsCriteria.PROFILE_DRIVING)
+                    .voiceUnits(DirectionsCriteria.METRIC)
                     .language(Locale.FRENCH.language)
                     .build()
                 mapboxMapMatchingRequest.enqueueCall(object : Callback<MapMatchingResponse> {
