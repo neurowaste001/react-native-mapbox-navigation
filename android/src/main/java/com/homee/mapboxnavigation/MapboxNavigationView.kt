@@ -711,6 +711,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
                     .voiceInstructions(true)
                     .bannerInstructions(true)
                     .waypointIndices(0, path.toList().lastIndex)
+                    .overview(DirectionsCriteria.OVERVIEW_FULL)
                     .profile(DirectionsCriteria.PROFILE_DRIVING)
                     .voiceUnits(DirectionsCriteria.METRIC)
                     .language(Locale.FRENCH.language)
