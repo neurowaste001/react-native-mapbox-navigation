@@ -18,7 +18,6 @@ import retrofit2.Response
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.api.matching.v5.MapboxMapMatching
-import com.mapbox.api.matching.v5.models.MapMatchingMatching
 import com.mapbox.api.matching.v5.models.MapMatchingResponse
 import com.mapbox.bindgen.Expected
 import com.mapbox.geojson.Point
@@ -53,6 +52,7 @@ import com.mapbox.api.directions.v5.DirectionsCriteria
 import com.mapbox.navigation.base.trip.model.RouteLegProgress
 import com.mapbox.navigation.base.trip.model.RouteProgress
 import com.mapbox.navigation.core.arrival.ArrivalObserver
+import com.mapbox.navigation.core.trip.session.OffRouteObserver
 import com.mapbox.navigation.ui.base.util.MapboxNavigationConsumer
 import com.mapbox.navigation.ui.maneuver.api.MapboxManeuverApi
 import com.mapbox.navigation.ui.maneuver.view.MapboxManeuverView
@@ -423,6 +423,16 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         }
     }
 
+    private val offRouteObserver = object : OffRouteObserver {
+
+        override fun onOffRouteStateChanged(offRoute: Boolean) {
+            val event = Arguments.createMap()
+            event.putBoolean("offRoute", offRoute)
+            context
+                .getJSModule(RCTEventEmitter::class.java)
+                .receiveEvent(id, "onRouteProgressChange", event)
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -630,6 +640,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         mapboxNavigation.registerLocationObserver(locationObserver)
         mapboxNavigation.registerVoiceInstructionsObserver(voiceInstructionsObserver)
         mapboxNavigation.registerRouteProgressObserver(replayProgressObserver)
+        mapboxNavigation.registerOffRouteObserver(offRouteObserver)
 
         if (this.path?.size == 0) {
             this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
@@ -641,10 +652,12 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         mapboxNavigation.unregisterRoutesObserver(routesObserver)
+        mapboxNavigation.unregisterArrivalObserver(arrivalObserver)
         mapboxNavigation.unregisterRouteProgressObserver(routeProgressObserver)
         mapboxNavigation.unregisterLocationObserver(locationObserver)
         mapboxNavigation.unregisterVoiceInstructionsObserver(voiceInstructionsObserver)
         mapboxNavigation.unregisterRouteProgressObserver(replayProgressObserver)
+        mapboxNavigation.unregisterOffRouteObserver(offRouteObserver)
     }
 
     private fun onDestroy() {
